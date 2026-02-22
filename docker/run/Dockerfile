@@ -24,9 +24,16 @@ ARG CACHE_DATE=none
 RUN echo "cache buster $CACHE_DATE" && bash /ins/install_A02.sh $BRANCH
 
 # Fix: Pin numpy/scipy/scikit-learn AFTER all installs to resolve ABI mismatch.
-# The base image's scipy 1.17 + numpy 2.x causes:
+# The upstream installs scipy 1.17 + numpy 2.x which causes:
 #   ValueError: All ufuncs must have type `numpy.ufunc`
-RUN /opt/venv-a0/bin/pip install --no-cache-dir --force-reinstall \
+# We must fully purge stale .so/.py files before reinstalling, otherwise
+# leftover Python files from scipy 1.17 reference symbols missing in 1.13.
+RUN /opt/venv-a0/bin/pip uninstall -y scipy numpy scikit-learn && \
+    rm -rf /opt/venv-a0/lib/python3.12/site-packages/scipy* \
+           /opt/venv-a0/lib/python3.12/site-packages/numpy* \
+           /opt/venv-a0/lib/python3.12/site-packages/sklearn* \
+           /opt/venv-a0/lib/python3.12/site-packages/scikit_learn* && \
+    /opt/venv-a0/bin/pip install --no-cache-dir \
     numpy==1.26.4 \
     scipy==1.13.1 \
     scikit-learn==1.5.2

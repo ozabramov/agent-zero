@@ -3,13 +3,12 @@
 # FROM agent0ai/agent-zero-base:testing
 FROM agent0ai/agent-zero-base:latest
 
-# Check if the argument is provided, else throw an error
-ARG BRANCH
-RUN if [ -z "$BRANCH" ]; then echo "ERROR: BRANCH is not set!" >&2; exit 1; fi
+# Branch to clone (default: main)
+ARG BRANCH=main
 ENV BRANCH=$BRANCH
 
 # Copy filesystem files to root
-COPY ./fs/ /
+COPY docker/run/fs/ /
 
 # pre installation steps
 RUN bash /ins/pre_install.sh $BRANCH

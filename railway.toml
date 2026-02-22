@@ -1,9 +1,5 @@
 [build]
 dockerfilePath = "docker/run/Dockerfile"
-dockerContext = "docker/run"
-
-[build.args]
-BRANCH = "main"
 
 [deploy]
 healthcheckPath = "/health"
